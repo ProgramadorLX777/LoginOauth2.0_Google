@@ -1,4 +1,28 @@
-<div *ngIf="user">
-  <h2>Bienvenido, {{ user.name }}</h2>
-  <p>{{ user.email }}</p>
-</div>
+@if (usuario(); as u) {
+  <header class="encabezado">
+    <div>
+      <h2>Bienvenido, {{ u.name }}</h2>
+      <p>{{ u.email }} · <strong>{{ u.rol }}</strong></p>
+    </div>
+    <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
+  </header>
+
+  <nav class="menu">
+    @for (item of menu(); track item.titulo) {
+      @if (item.ruta) {
+        <a class="tarjeta" [routerLink]="item.ruta">
+          <h3>{{ item.titulo }}</h3>
+          <p>{{ item.descripcion }}</p>
+        </a>
+      } @else {
+        <div class="tarjeta deshabilitada">
+          <h3>{{ item.titulo }}</h3>
+          <p>{{ item.descripcion }}</p>
+          <small>Próximamente</small>
+        </div>
+      }
+    }
+  </nav>
+} @else {
+  <p>Cargando tu sesión...</p>
+}

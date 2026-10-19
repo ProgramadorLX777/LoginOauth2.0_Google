@@ -1,0 +1,5 @@
+.encabezado { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; }
+.menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; padding: 0 24px 24px; }
+.tarjeta { display: block; padding: 16px; border: 1px solid #ccc; border-radius: 8px; text-decoration: none; color: inherit; }
+.tarjeta:hover:not(.deshabilitada) { border-color: #555; }
+.deshabilitada { opacity: 0.55; }

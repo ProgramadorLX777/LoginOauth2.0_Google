@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const oAuth2Client = require('../auth/googleClient');
+const { buscarUsuarioActivoPorCorreo } = require('../auth/usuarios');
 
 // Paso 1: el usuario hace clic en "Iniciar sesión con Google"
 // El frontend simplemente redirige el navegador a esta ruta
@@ -41,14 +42,26 @@ router.get('/google/callback', async (req, res) => {
     const payload = ticket.getPayload();
     // payload contiene: email, name, picture, sub (id de Google), etc.
 
-    // Aquí buscas/creas al usuario en tu BD
-    // const user = await findOrCreateUser(payload);
+    // El correo de Google debe estar verificado
+    if (!payload.email_verified) {
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=correo_no_verificado`);
+    }
 
-    // Creamos tu propia sesión
+    // Solo entra quien esté registrado y activo en la tabla usuarios
+    const usuario = await buscarUsuarioActivoPorCorreo(payload.email);
+    if (!usuario) {
+      return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_autorizado`);
+    }
+
+    // Creamos tu propia sesión, ahora con el rol que viene de la BD
     req.session.user = {
+      id_usuario: usuario.id_usuario,
       email: payload.email,
-      name: payload.name,
-      googleId: payload.sub
+      name: usuario.nombre || payload.name,
+      googleId: payload.sub,
+      rol: usuario.rol,
+      rut_estudiante: usuario.rut_estudiante,
+      rut_docente: usuario.rut_docente
     };
 
     // Redirigimos de vuelta al frontend, ya logueado
@@ -60,11 +73,24 @@ router.get('/google/callback', async (req, res) => {
 });
 
 // Endpoint para que Angular consulte si hay sesión activa
-router.get('/me', (req, res) => {
-  if (req.session.user) {
+// Consulta la BD cada vez: si el admin desactiva a alguien o le cambia el rol, se nota de inmediato
+router.get('/me', async (req, res) => {
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({ authenticated: false });
+  }
+
+  try {
+    const usuario = await buscarUsuarioActivoPorCorreo(req.session.user.email);
+    if (!usuario) {
+      req.session = null;
+      return res.status(401).json({ authenticated: false });
+    }
+
+    req.session.user.rol = usuario.rol;
     res.json({ authenticated: true, user: req.session.user });
-  } else {
-    res.status(401).json({ authenticated: false });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ authenticated: false });
   }
 });
 
