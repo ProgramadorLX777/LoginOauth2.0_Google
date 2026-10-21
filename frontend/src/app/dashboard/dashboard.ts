@@ -15,7 +15,8 @@ const MENU: ItemMenu[] = [
   { titulo: 'Docentes', descripcion: 'Gestionar docentes', ruta: null, roles: ['administrador'] },
   { titulo: 'Centros de práctica', descripcion: 'Empresas donde se realizan las prácticas', ruta: null, roles: ['administrador', 'docente'] },
   { titulo: 'Generar práctica', descripcion: 'Generar el documento de práctica en PDF', ruta: '/generar-practica', roles: ['administrador', 'docente'] },
-  { titulo: 'Mi perfil', descripcion: 'Ver y completar mis datos', ruta: null, roles: ['docente', 'estudiante'] },
+  { titulo: 'Mi perfil', descripcion: 'Ver y completar mis datos personales', ruta: '/mi-perfil', roles: ['estudiante'] },
+  { titulo: 'Mis documentos', descripcion: 'Descargar y subir documentos de tu práctica', ruta: null, roles: ['estudiante'] },
 ];
 
 @Component({

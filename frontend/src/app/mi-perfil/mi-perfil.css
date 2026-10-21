@@ -1,0 +1,11 @@
+.contenedor { max-width: 640px; margin: 0 auto; padding: 24px; }
+.bloque { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+.ayuda { font-size: 0.9em; opacity: 0.75; }
+dl { display: grid; grid-template-columns: 180px 1fr; gap: 6px 12px; margin: 0; }
+dt { font-weight: 600; }
+dd { margin: 0; }
+label { display: block; margin-top: 12px; }
+input { display: block; width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
+button { margin-top: 16px; padding: 8px 16px; }
+.error { color: #b00020; }
+.ok { color: #1b7a32; }

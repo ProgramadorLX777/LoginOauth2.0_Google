@@ -77,6 +77,7 @@ router.get('/google/callback', async (req, res) => {
 router.get('/me', async (req, res) => {
   if (!req.session || !req.session.user) {
     return res.status(401).json({ authenticated: false });
+    
   }
 
   try {
@@ -87,6 +88,8 @@ router.get('/me', async (req, res) => {
     }
 
     req.session.user.rol = usuario.rol;
+    req.session.user.rut_estudiante = usuario.rut_estudiante;
+    req.session.user.rut_docente = usuario.rut_docente;
     res.json({ authenticated: true, user: req.session.user });
   } catch (err) {
     console.error(err);

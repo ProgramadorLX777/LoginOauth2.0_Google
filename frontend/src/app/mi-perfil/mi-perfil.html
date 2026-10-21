@@ -1,0 +1,66 @@
+<div class="contenedor">
+  <a routerLink="/dashboard">← Volver al menú</a>
+  <h2>Mi perfil</h2>
+
+  @if (perfil(); as p) {
+    <section class="bloque">
+      <h3>Datos del establecimiento</h3>
+      <p class="ayuda">Estos datos no puedes modificarlos. Si hay un error, avisa a tu profesor o al administrador.</p>
+      <dl>
+        <dt>Nombre</dt><dd>{{ p.nombre_completo }}</dd>
+        <dt>RUT</dt><dd>{{ p.rut_completo }}</dd>
+        <dt>Fecha de nacimiento</dt><dd>{{ p.fecha_nacimiento }}</dd>
+        <dt>Curso</dt><dd>{{ p.curso }}</dd>
+        <dt>Especialidad</dt><dd>{{ p.especialidad }}</dd>
+        <dt>Estado</dt><dd>{{ p.estado }}</dd>
+      </dl>
+    </section>
+
+    <form class="bloque" [formGroup]="form" (ngSubmit)="guardar()">
+      <h3>Mis datos de contacto</h3>
+
+      <label>Dirección
+        <input formControlName="direccion" maxlength="100" />
+      </label>
+      @if (form.controls.direccion.touched && form.controls.direccion.invalid) {
+        <small class="error">La dirección es obligatoria.</small>
+      }
+
+      <label>Comuna
+        <input formControlName="comuna" maxlength="100" />
+      </label>
+      @if (form.controls.comuna.touched && form.controls.comuna.invalid) {
+        <small class="error">La comuna es obligatoria.</small>
+      }
+
+      <label>Correo
+        <input formControlName="correo" type="email" maxlength="100" />
+      </label>
+      @if (form.controls.correo.touched && form.controls.correo.invalid) {
+        <small class="error">Ingresa un correo válido.</small>
+      }
+
+      <label>Teléfono
+        <input formControlName="telefono_estudiante" maxlength="15" />
+      </label>
+      @if (form.controls.telefono_estudiante.touched && form.controls.telefono_estudiante.invalid) {
+        <small class="error">Usa solo números (8 a 15 dígitos).</small>
+      }
+
+      <label>Celular
+        <input formControlName="celular_estudiante" maxlength="15" />
+      </label>
+      @if (form.controls.celular_estudiante.touched && form.controls.celular_estudiante.invalid) {
+        <small class="error">Usa solo números (8 a 15 dígitos).</small>
+      }
+
+      <button type="submit" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
+
+      @if (mensaje()) { <p class="ok">{{ mensaje() }}</p> }
+    </form>
+  }
+
+  @if (error()) { <p class="error">{{ error() }}</p> }
+</div>

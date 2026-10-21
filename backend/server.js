@@ -3,7 +3,8 @@ const express = require('express');
 const cookieSession = require('cookie-session');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
-const generarPdfRoute = require('./routes/generarPdf.route');   // <-- NUEVO
+const generarPdfRoute = require('./routes/generarPdf.route');  
+const estudianteRoutes = require('./routes/estudiante.route');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(cookieSession({
 }));
 
 app.use('/auth', authRoutes);
-app.use(generarPdfRoute);   // <-- NUEVO
+app.use('/estudiante', estudianteRoutes);
+app.use(generarPdfRoute);   
 
 app.listen(3000, () => console.log('Backend en http://localhost:3000'));
