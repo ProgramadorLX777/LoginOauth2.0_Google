@@ -1,0 +1,12 @@
+.contenedor { max-width: 720px; margin: 0 auto; padding: 24px; }
+.ayuda { font-size: 0.9em; opacity: 0.75; }
+.tarjeta { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.tarjeta header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.tarjeta h3 { margin: 0; }
+.tag { font-size: 0.7em; border: 1px solid #888; border-radius: 4px; padding: 2px 6px; margin-left: 6px; vertical-align: middle; }
+.estado { white-space: nowrap; font-weight: 600; }
+.observacion { background: #fff3e0; border-left: 4px solid #ef6c00; padding: 8px 12px; color: #4e2a00; }
+.subir { display: block; margin-top: 8px; }
+.subir input { display: block; margin-top: 4px; }
+.error { color: #b00020; }
+.ok { color: #1b7a32; }

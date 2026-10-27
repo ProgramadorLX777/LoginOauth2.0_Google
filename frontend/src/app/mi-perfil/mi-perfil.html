@@ -3,6 +3,12 @@
   <h2>Mi perfil</h2>
 
   @if (perfil(); as p) {
+    @if (p.perfil_completo) {
+      <p class="ok">✅ Tu perfil está completo.</p>
+    } @else {
+      <p class="aviso">⚠️ Para completar tu perfil falta: {{ p.faltantes.join(', ') }}.</p>
+    }
+
     <section class="bloque">
       <h3>Datos del establecimiento</h3>
       <p class="ayuda">Estos datos no puedes modificarlos. Si hay un error, avisa a tu profesor o al administrador.</p>
@@ -10,8 +16,15 @@
         <dt>Nombre</dt><dd>{{ p.nombre_completo }}</dd>
         <dt>RUT</dt><dd>{{ p.rut_completo }}</dd>
         <dt>Fecha de nacimiento</dt><dd>{{ p.fecha_nacimiento }}</dd>
+        <dt>Generación</dt><dd>{{ p.anio_generacion }}</dd>
         <dt>Curso</dt><dd>{{ p.curso }}</dd>
         <dt>Especialidad</dt><dd>{{ p.especialidad }}</dd>
+        <dt>Correo institucional</dt><dd>{{ p.correo_institucional ?? 'No registrado' }}</dd>
+        <dt>Profesor tutor (maestro guía)</dt>
+        <dd>
+          {{ p.tutor_nombre ?? 'Aún no asignado' }}
+          @if (p.tutor_correo) { · {{ p.tutor_correo }} }
+        </dd>
         <dt>Estado</dt><dd>{{ p.estado }}</dd>
       </dl>
     </section>
@@ -33,13 +46,6 @@
         <small class="error">La comuna es obligatoria.</small>
       }
 
-      <label>Correo
-        <input formControlName="correo" type="email" maxlength="100" />
-      </label>
-      @if (form.controls.correo.touched && form.controls.correo.invalid) {
-        <small class="error">Ingresa un correo válido.</small>
-      }
-
       <label>Teléfono
         <input formControlName="telefono_estudiante" maxlength="15" />
       </label>
@@ -53,6 +59,8 @@
       @if (form.controls.celular_estudiante.touched && form.controls.celular_estudiante.invalid) {
         <small class="error">Usa solo números (8 a 15 dígitos).</small>
       }
+
+      <p class="ayuda">Indica al menos un teléfono o un celular.</p>
 
       <button type="submit" [disabled]="guardando()">
         {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}

@@ -23,19 +23,21 @@ export class MiPerfil implements OnInit {
   form = this.fb.nonNullable.group({
     direccion: ['', [Validators.required, Validators.maxLength(100)]],
     comuna: ['', [Validators.required, Validators.maxLength(100)]],
-    correo: ['', [Validators.email, Validators.maxLength(100)]],
     telefono_estudiante: ['', [Validators.pattern(FONO)]],
     celular_estudiante: ['', [Validators.pattern(FONO)]],
   });
 
   ngOnInit() {
+    this.cargar();
+  }
+
+  cargar() {
     this.api.obtenerPerfil().subscribe({
       next: p => {
         this.perfil.set(p);
         this.form.patchValue({
           direccion: p.direccion,
           comuna: p.comuna,
-          correo: p.correo ?? '',
           telefono_estudiante: p.telefono_estudiante ?? '',
           celular_estudiante: p.celular_estudiante ?? '',
         });
@@ -57,6 +59,7 @@ export class MiPerfil implements OnInit {
       next: () => {
         this.mensaje.set('Tus datos se guardaron correctamente.');
         this.guardando.set(false);
+        this.cargar(); // recarga para actualizar el aviso de "perfil completo"
       },
       error: () => {
         this.error.set('No se pudo guardar. Revisa los datos e inténtalo de nuevo.');

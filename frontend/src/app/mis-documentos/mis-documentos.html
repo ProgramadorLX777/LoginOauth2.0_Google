@@ -1,0 +1,53 @@
+<div class="contenedor">
+  <a routerLink="/dashboard">← Volver al menú</a>
+  <h2>Mis documentos</h2>
+  <p class="ayuda">
+    Sube cada documento firmado en PDF (máximo 5 MB). Si te lo observan, súbelo corregido:
+    se guarda como una versión nueva y la anterior queda en el historial.
+  </p>
+
+  @if (mensaje()) { <p class="ok">{{ mensaje() }}</p> }
+  @if (error()) { <p class="error">{{ error() }}</p> }
+  @if (cargando()) { <p>Cargando tus documentos...</p> }
+
+  @for (d of documentos(); track d.id_tipo_documento) {
+    <section class="tarjeta">
+      <header>
+        <h3>
+          {{ d.nombre }}
+          @if (d.obligatorio) { <span class="tag">Obligatorio</span> }
+        </h3>
+        <span class="estado">{{ etiqueta(d.estado) }}</span>
+      </header>
+
+      <p class="ayuda">{{ d.descripcion }}</p>
+
+      @if (d.id_documento) {
+        <p>
+          Versión {{ d.version }} · {{ d.nombre_original }} ·
+          {{ d.creado_en | date:'dd/MM/yyyy HH:mm' }}
+          · <a [href]="urlDescarga(d.id_documento)">Descargar</a>
+        </p>
+      }
+
+      @if (d.estado === 'observado' && d.observacion) {
+        <p class="observacion"><strong>Observación:</strong> {{ d.observacion }}</p>
+      }
+
+      @if (d.estado === 'aprobado') {
+        <p class="ok">Documento aprobado. No necesitas hacer nada más.</p>
+      } @else {
+        <label class="subir">
+          {{ d.id_documento ? 'Subir versión corregida' : 'Subir documento (PDF)' }}
+          <input
+            type="file"
+            accept="application/pdf"
+            [disabled]="subiendoId() !== null"
+            (change)="onArchivo(d, $event)"
+          />
+        </label>
+        @if (subiendoId() === d.id_tipo_documento) { <p>Subiendo...</p> }
+      }
+    </section>
+  }
+</div>

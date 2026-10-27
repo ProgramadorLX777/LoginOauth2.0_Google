@@ -5,6 +5,9 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const generarPdfRoute = require('./routes/generarPdf.route');  
 const estudianteRoutes = require('./routes/estudiante.route');
+const misDocumentosRoutes = require('./routes/misDocumentos.route'); 
+const miEmpresaRoutes = require('./routes/miEmpresa.route');
+const docenteRoutes = require('./routes/docente.route'); 
 
 const app = express();
 
@@ -23,6 +26,9 @@ app.use(cookieSession({
 
 app.use('/auth', authRoutes);
 app.use('/estudiante', estudianteRoutes);
+app.use('/estudiante', miEmpresaRoutes);
+app.use('/estudiante', misDocumentosRoutes);
+app.use('/docente', docenteRoutes)
 app.use(generarPdfRoute);   
 
 app.listen(3000, () => console.log('Backend en http://localhost:3000'));
