@@ -13,12 +13,14 @@ const MENU: ItemMenu[] = [
   { titulo: 'Usuarios', descripcion: 'Agregar y administrar usuarios del sistema', ruta: null, roles: ['administrador'] },
   { titulo: 'Estudiantes', descripcion: 'Ver y gestionar estudiantes', ruta: null, roles: ['administrador'] },
   { titulo: 'Mis estudiantes', descripcion: 'Estudiantes de los que eres profesor tutor', ruta: '/mis-estudiantes', roles: ['docente'] },
-  { titulo: 'Docentes', descripcion: 'Gestionar docentes', ruta: null, roles: ['administrador'] },
+  { titulo: 'Docentes', descripcion: 'Gestionar docentes tutores', ruta: '/admin/docentes', roles: ['administrador'] },
   { titulo: 'Centros de práctica', descripcion: 'Empresas donde se realizan las prácticas', ruta: null, roles: ['administrador', 'docente'] },
   { titulo: 'Generar práctica', descripcion: 'Generar el documento de práctica en PDF', ruta: '/generar-practica', roles: ['administrador', 'docente'] },
   { titulo: 'Mi perfil', descripcion: 'Ver y completar mis datos personales', ruta: '/mi-perfil', roles: ['estudiante'] },
   { titulo: 'Mis documentos', descripcion: 'Descargar y subir documentos de tu práctica', ruta: '/mis-documentos', roles: ['estudiante'] },
   { titulo: 'Mi empresa', descripcion: 'Informa tu centro de práctica y tu supervisor', ruta: '/mi-empresa', roles: ['estudiante'] },
+  { titulo: 'Generaciones', descripcion: 'Crear y administrar generaciones', ruta: '/admin/generaciones', roles: ['administrador'] },
+  { titulo: 'Especialidades', descripcion: 'Catálogo de especialidades y menciones', ruta: '/admin/especialidades', roles: ['administrador'] },
 ];
 
 @Component({

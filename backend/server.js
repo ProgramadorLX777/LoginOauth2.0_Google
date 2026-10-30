@@ -8,6 +8,9 @@ const estudianteRoutes = require('./routes/estudiante.route');
 const misDocumentosRoutes = require('./routes/misDocumentos.route'); 
 const miEmpresaRoutes = require('./routes/miEmpresa.route');
 const docenteRoutes = require('./routes/docente.route'); 
+const adminEspecialidadesRoutes = require('./routes/adminEspecialidades.route');
+const adminGeneracionesRoutes = require('./routes/adminGeneraciones.route');
+const adminDocentesRoutes = require('./routes/adminDocentes.route');
 
 const app = express();
 
@@ -28,7 +31,10 @@ app.use('/auth', authRoutes);
 app.use('/estudiante', estudianteRoutes);
 app.use('/estudiante', miEmpresaRoutes);
 app.use('/estudiante', misDocumentosRoutes);
-app.use('/docente', docenteRoutes)
+app.use('/docente', docenteRoutes);
+app.use('/admin/especialidades', adminEspecialidadesRoutes);
+app.use('/admin/generaciones', adminGeneracionesRoutes);  
+app.use('/admin/docentes', adminDocentesRoutes);  
 app.use(generarPdfRoute);   
 
 app.listen(3000, () => console.log('Backend en http://localhost:3000'));
