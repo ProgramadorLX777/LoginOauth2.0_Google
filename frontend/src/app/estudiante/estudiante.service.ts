@@ -63,7 +63,7 @@ export class EstudianteService {
     return this.http.post<{ ok: boolean; version: number }>(
       `${this.api}/mis-documentos/${idTipo}`,
       datos,
-      { withCredentials: true }
+      { withCredentials: true, reportProgress: true },
     );
   }
 

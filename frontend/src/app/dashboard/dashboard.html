@@ -1,28 +1,26 @@
-@if (usuario(); as u) {
-  <header class="encabezado">
-    <div>
-      <h2>Bienvenido, {{ u.name }}</h2>
-      <p>{{ u.email }} · <strong>{{ u.rol }}</strong></p>
-    </div>
-    <button type="button" (click)="cerrarSesion()">Cerrar sesión</button>
-  </header>
+<h2>Hola, {{ usuario()?.name }}</h2>
+<p class="sub">¿Qué quieres hacer hoy?</p>
 
-  <nav class="menu">
-    @for (item of menu(); track item.titulo) {
-      @if (item.ruta) {
-        <a class="tarjeta" [routerLink]="item.ruta">
-          <h3>{{ item.titulo }}</h3>
-          <p>{{ item.descripcion }}</p>
-        </a>
-      } @else {
-        <div class="tarjeta deshabilitada">
-          <h3>{{ item.titulo }}</h3>
-          <p>{{ item.descripcion }}</p>
-          <small>Próximamente</small>
-        </div>
-      }
+<div class="grilla">
+  @for (item of menu(); track item.titulo) {
+    @if (item.ruta) {
+      <a class="enlace" [routerLink]="item.ruta">
+        <mat-card appearance="outlined" class="tarjeta">
+          <mat-card-header>
+            <mat-icon class="icono" fontSet="material-symbols-outlined">{{ item.icono }}</mat-icon>
+            <mat-card-title>{{ item.titulo }}</mat-card-title>
+            <mat-card-subtitle>{{ item.descripcion }}</mat-card-subtitle>
+          </mat-card-header>
+        </mat-card>
+      </a>
+    } @else {
+      <mat-card appearance="outlined" class="tarjeta pronto">
+        <mat-card-header>
+          <mat-icon class="icono" fontSet="material-symbols-outlined">{{ item.icono }}</mat-icon>
+          <mat-card-title>{{ item.titulo }}</mat-card-title>
+          <mat-card-subtitle>Próximamente</mat-card-subtitle>
+        </mat-card-header>
+      </mat-card>
     }
-  </nav>
-} @else {
-  <p>Cargando tu sesión...</p>
-}
+  }
+</div>

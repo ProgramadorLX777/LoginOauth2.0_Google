@@ -1,1 +1,28 @@
-<button (click)="loginWithGoogle()">Iniciar sesión con Google</button>
+<main class="fondo">
+  <mat-card class="tarjeta" appearance="outlined">
+    <mat-card-content class="contenido">
+      <mat-icon class="logo" fontSet="material-symbols-outlined">school</mat-icon>
+
+      <h1>SIGP-TP</h1>
+      <p class="subtitulo">Sistema de Gestión de Prácticas y Titulación Técnico Profesional</p>
+
+      <p class="descripcion">
+        Accede con tu correo institucional para completar tu perfil, subir tus documentos
+        y hacer seguimiento de tu práctica.
+      </p>
+
+      <button
+        mat-flat-button
+        type="button"
+        class="boton"
+        [disabled]="redirigiendo()"
+        (click)="loginWithGoogle()"
+      >
+        <mat-icon fontSet="material-symbols-outlined">login</mat-icon>
+        {{ redirigiendo() ? 'Redirigiendo a Google...' : 'Iniciar sesión con Google' }}
+      </button>
+
+      <p class="nota">Solo pueden ingresar usuarios registrados por el colegio.</p>
+    </mat-card-content>
+  </mat-card>
+</main>

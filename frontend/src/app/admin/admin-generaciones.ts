@@ -1,78 +1,72 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { ConfirmarDialog } from '../shared/confirmar-dialog';
+import { NotificacionService } from '../shared/notificacion.service';
 import { AdminService, Generacion } from './admin.service';
+import { GeneracionDialog } from './generacion-dialog';
 
 @Component({
   selector: 'app-admin-generaciones',
-  imports: [ReactiveFormsModule],
+  imports: [MatButtonModule, MatIconModule],
   template: `
     <h2>Generaciones</h2>
     <p class="ayuda">
-      Cada generación agrupa a los estudiantes que egresan un mismo año.
-      Las generaciones no se eliminan, para conservar la historia.
+      Una generación agrupa a los estudiantes que egresan el mismo año.
+      No se eliminan: se desactivan.
     </p>
 
-    @if (mensaje()) { <p class="ok">{{ mensaje() }}</p> }
-    @if (error()) { <p class="error">{{ error() }}</p> }
+    <div class="barra">
+      <button mat-flat-button type="button" (click)="nueva()">
+        <mat-icon fontSet="material-symbols-outlined">add</mat-icon> Nueva generación
+      </button>
+    </div>
 
-    <form class="alta" (submit)="enviar($event)">
-      <label>Nueva generación (año)
-        <input type="number" [formControl]="anio" placeholder="2028" />
-      </label>
-      <button type="submit">Crear</button>
-    </form>
-    @if (anio.touched && anio.invalid) {
-      <small class="error">Ingresa un año válido (entre 1990 y 2100).</small>
-    }
-
-    @if (cargando()) {
-      <p>Cargando...</p>
-    } @else {
+    <div class="tabla-scroll">
       <table>
         <thead>
-          <tr><th>Generación</th><th>Estudiantes</th><th>Estado</th><th></th></tr>
+          <tr><th>Año</th><th>Nombre</th><th>Estudiantes</th><th>Estado</th><th></th></tr>
         </thead>
         <tbody>
           @for (g of generaciones(); track g.anio) {
             <tr>
+              <td>{{ g.anio }}</td>
               <td>{{ g.nombre }}</td>
               <td>{{ g.estudiantes }}</td>
-              <td>{{ g.activa ? 'Activa' : 'Inactiva' }}</td>
               <td>
-                <button type="button" class="secundario" (click)="alternar(g)">
+                <span class="chip" [class.inactivo]="!g.activa">{{ g.activa ? 'Activa' : 'Inactiva' }}</span>
+              </td>
+              <td class="acciones">
+                <button mat-button type="button" (click)="alternar(g)">
                   {{ g.activa ? 'Desactivar' : 'Activar' }}
                 </button>
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="4">Todavía no hay generaciones.</td></tr>
+            <tr><td colspan="5">No hay generaciones.</td></tr>
           }
         </tbody>
       </table>
-    }
+    </div>
   `,
   styles: [`
-    .ayuda { font-size: 0.9em; opacity: 0.75; }
-    .alta { display: flex; gap: 12px; align-items: flex-end; margin: 16px 0 4px; }
-    .alta label { display: block; }
-    .alta input { display: block; padding: 8px; margin-top: 4px; }
-    button { padding: 8px 16px; }
-    .secundario { background: transparent; border: 1px solid #888; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ccc; }
-    .error { color: #b00020; }
-    .ok { color: #1b7a32; }
+    .ayuda { font-size: 0.9rem; opacity: 0.75; }
+    .barra { margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--mat-sys-outline-variant); }
+    th { position: sticky; top: 0; background: var(--mat-sys-surface); z-index: 1; }
+    .acciones { white-space: nowrap; }
+    .chip { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; background: #c8e6c9; color: #1b5e20; }
+    .chip.inactivo { background: #e0e0e0; color: #424242; }
   `],
 })
 export class AdminGeneraciones implements OnInit {
   private api = inject(AdminService);
+  private dialog = inject(MatDialog);
+  private aviso = inject(NotificacionService);
 
   generaciones = signal<Generacion[]>([]);
-  cargando = signal(true);
-  mensaje = signal('');
-  error = signal('');
-
-  anio = new FormControl<number | null>(null, [Validators.required, Validators.min(1990), Validators.max(2100)]);
 
   ngOnInit() {
     this.cargar();
@@ -80,59 +74,51 @@ export class AdminGeneraciones implements OnInit {
 
   cargar() {
     this.api.listarGeneraciones().subscribe({
-      next: lista => {
-        this.generaciones.set(lista);
-        this.cargando.set(false);
-      },
-      error: () => {
-        this.error.set('No se pudieron cargar las generaciones.');
-        this.cargando.set(false);
-      },
+      next: lista => this.generaciones.set(lista),
+      error: () => this.aviso.error('No se pudieron cargar las generaciones.'),
     });
   }
 
-  enviar(evento: Event) {
-    evento.preventDefault();
-    this.crear();
-  }
-
-  crear(excepcion = false) {
-    this.mensaje.set('');
-    this.error.set('');
-    const anio = this.anio.value;
-    if (this.anio.invalid || anio === null) {
-      this.anio.markAsTouched();
-      return;
-    }
-
-    this.api.crearGeneracion(anio, excepcion).subscribe({
-      next: () => {
-        this.mensaje.set(`Generación ${anio} creada.`);
-        this.anio.reset();
+  nueva() {
+    this.dialog
+      .open(GeneracionDialog, { width: '420px', maxWidth: '95vw', disableClose: true })
+      .afterClosed()
+      .subscribe(creada => {
+        if (!creada) return;
+        this.aviso.ok('Generación creada.');
         this.cargar();
-      },
-      error: e => {
-        // Regla de la guía: antes de 2026 solo como excepción confirmada
-        if (e.error?.codigo === 'REQUIERE_EXCEPCION') {
-          if (confirm(`La generación ${anio} es anterior a 2026. ¿Confirmas crearla como excepción?`)) {
-            this.crear(true);
-          }
-          return;
-        }
-        this.error.set(e.error?.error ?? 'No se pudo crear la generación.');
-      },
-    });
+      });
   }
 
   alternar(g: Generacion) {
-    const activar = !g.activa;
-    if (!activar && !confirm(`¿Desactivar la ${g.nombre}? Sus datos se conservan.`)) return;
+    if (!g.activa) {
+      this.cambiar(g, true);
+      return;
+    }
 
-    this.mensaje.set('');
-    this.error.set('');
-    this.api.cambiarGeneracion(g.anio, activar).subscribe({
-      next: () => this.cargar(),
-      error: e => this.error.set(e.error?.error ?? 'No se pudo actualizar la generación.'),
+    const aviso = g.estudiantes > 0 ? ` Tiene ${g.estudiantes} estudiante(s).` : '';
+    this.dialog
+      .open(ConfirmarDialog, {
+        data: {
+          titulo: 'Desactivar generación',
+          mensaje: `¿Desactivar la generación ${g.anio}?${aviso}`,
+          textoConfirmar: 'Desactivar',
+        },
+        maxWidth: '95vw',
+      })
+      .afterClosed()
+      .subscribe(ok => {
+        if (ok) this.cambiar(g, false);
+      });
+  }
+
+  private cambiar(g: Generacion, activa: boolean) {
+    this.api.cambiarGeneracion(g.anio, activa).subscribe({
+      next: () => {
+        this.aviso.ok(activa ? 'Generación activada.' : 'Generación desactivada.');
+        this.cargar();
+      },
+      error: e => this.aviso.error(e.error?.error ?? 'No se pudo cambiar el estado.'),
     });
   }
 }

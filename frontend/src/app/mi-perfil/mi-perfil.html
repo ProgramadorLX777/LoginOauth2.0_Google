@@ -1,74 +1,51 @@
-<div class="contenedor">
-  <a routerLink="/dashboard">← Volver al menú</a>
-  <h2>Mi perfil</h2>
+<h2>Mi perfil</h2>
 
-  @if (perfil(); as p) {
-    @if (p.perfil_completo) {
-      <p class="ok">✅ Tu perfil está completo.</p>
-    } @else {
-      <p class="aviso">⚠️ Para completar tu perfil falta: {{ p.faltantes.join(', ') }}.</p>
-    }
-
-    <section class="bloque">
-      <h3>Datos del establecimiento</h3>
-      <p class="ayuda">Estos datos no puedes modificarlos. Si hay un error, avisa a tu profesor o al administrador.</p>
-      <dl>
-        <dt>Nombre</dt><dd>{{ p.nombre_completo }}</dd>
-        <dt>RUT</dt><dd>{{ p.rut_completo }}</dd>
-        <dt>Fecha de nacimiento</dt><dd>{{ p.fecha_nacimiento }}</dd>
-        <dt>Generación</dt><dd>{{ p.anio_generacion }}</dd>
-        <dt>Curso</dt><dd>{{ p.curso }}</dd>
-        <dt>Especialidad</dt><dd>{{ p.especialidad }}</dd>
-        <dt>Correo institucional</dt><dd>{{ p.correo_institucional ?? 'No registrado' }}</dd>
-        <dt>Profesor tutor (maestro guía)</dt>
-        <dd>
-          {{ p.tutor_nombre ?? 'Aún no asignado' }}
-          @if (p.tutor_correo) { · {{ p.tutor_correo }} }
-        </dd>
-        <dt>Estado</dt><dd>{{ p.estado }}</dd>
-      </dl>
-    </section>
-
-    <form class="bloque" [formGroup]="form" (ngSubmit)="guardar()">
-      <h3>Mis datos de contacto</h3>
-
-      <label>Dirección
-        <input formControlName="direccion" maxlength="100" />
-      </label>
-      @if (form.controls.direccion.touched && form.controls.direccion.invalid) {
-        <small class="error">La dirección es obligatoria.</small>
-      }
-
-      <label>Comuna
-        <input formControlName="comuna" maxlength="100" />
-      </label>
-      @if (form.controls.comuna.touched && form.controls.comuna.invalid) {
-        <small class="error">La comuna es obligatoria.</small>
-      }
-
-      <label>Teléfono
-        <input formControlName="telefono_estudiante" maxlength="15" />
-      </label>
-      @if (form.controls.telefono_estudiante.touched && form.controls.telefono_estudiante.invalid) {
-        <small class="error">Usa solo números (8 a 15 dígitos).</small>
-      }
-
-      <label>Celular
-        <input formControlName="celular_estudiante" maxlength="15" />
-      </label>
-      @if (form.controls.celular_estudiante.touched && form.controls.celular_estudiante.invalid) {
-        <small class="error">Usa solo números (8 a 15 dígitos).</small>
-      }
-
-      <p class="ayuda">Indica al menos un teléfono o un celular.</p>
-
-      <button type="submit" [disabled]="guardando()">
-        {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
-      </button>
-
-      @if (mensaje()) { <p class="ok">{{ mensaje() }}</p> }
-    </form>
+@if (perfil(); as p) {
+  @if (p.perfil_completo) {
+    <p class="completo">
+      <mat-icon fontSet="material-symbols-outlined">check_circle</mat-icon>
+      Tu perfil está completo.
+    </p>
+  } @else {
+    <div class="faltantes" role="status">
+      <strong>Para completar tu perfil falta:</strong>
+      <ul>
+        @for (f of p.faltantes; track f) { <li>{{ f }}</li> }
+      </ul>
+    </div>
   }
 
-  @if (error()) { <p class="error">{{ error() }}</p> }
-</div>
+  <section class="bloque">
+    <h3>Datos del establecimiento</h3>
+    <p class="ayuda">
+      Estos datos no puedes modificarlos. Si hay un error, avisa a tu profesor o al administrador.
+    </p>
+    <div class="grilla">
+      @for (c of datosEstablecimiento(); track c.etiqueta) {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="campo">
+          <mat-label>{{ c.etiqueta }}</mat-label>
+          <input matInput disabled [value]="c.valor || '—'" />
+        </mat-form-field>
+      }
+    </div>
+  </section>
+
+  <section class="bloque">
+    <h3>Mis datos de contacto</h3>
+    <div class="grilla">
+      @for (c of datosContacto(); track c.etiqueta) {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="campo"
+                        [class.falta]="!c.valor && (c.etiqueta === 'Dirección' || c.etiqueta === 'Comuna')">
+          <mat-label>{{ c.etiqueta }}</mat-label>
+          <input matInput disabled [value]="c.valor || '—'" />
+        </mat-form-field>
+      }
+    </div>
+    <div class="acciones">
+      <button mat-flat-button type="button" (click)="editar()">
+        <mat-icon fontSet="material-symbols-outlined">edit</mat-icon>
+        Editar mis datos de contacto
+      </button>
+    </div>
+  </section>
+}

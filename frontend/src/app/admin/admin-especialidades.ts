@@ -1,36 +1,29 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { ConfirmarDialog } from '../shared/confirmar-dialog';
+import { NotificacionService } from '../shared/notificacion.service';
 import { AdminService, Especialidad } from './admin.service';
+import { EspecialidadDialog } from './especialidad-dialog';
 
 @Component({
   selector: 'app-admin-especialidades',
-  imports: [ReactiveFormsModule],
+  imports: [MatButtonModule, MatIconModule],
   template: `
     <h2>Especialidades</h2>
     <p class="ayuda">
-      Catálogo de especialidades del colegio. Si la especialidad tiene mención
-      (por ejemplo, Administración mención Logística), se indica aparte.
+      Catálogo de especialidades y menciones. No se eliminan: se desactivan,
+      y las inactivas dejan de ofrecerse al crear docentes.
     </p>
 
-    @if (mensaje()) { <p class="ok">{{ mensaje() }}</p> }
-    @if (error()) { <p class="error">{{ error() }}</p> }
+    <div class="barra">
+      <button mat-flat-button type="button" (click)="nueva()">
+        <mat-icon fontSet="material-symbols-outlined">add</mat-icon> Nueva especialidad
+      </button>
+    </div>
 
-    <form class="alta" [formGroup]="form" (ngSubmit)="crear()">
-      <label>Especialidad
-        <input formControlName="nombre" maxlength="80" placeholder="Conectividad y Redes" />
-      </label>
-      <label>Mención (opcional)
-        <input formControlName="mencion" maxlength="80" placeholder="Logística" />
-      </label>
-      <button type="submit">Crear</button>
-    </form>
-    @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
-      <small class="error">El nombre debe tener entre 2 y 80 caracteres.</small>
-    }
-
-    @if (cargando()) {
-      <p>Cargando...</p>
-    } @else {
+    <div class="tabla-scroll">
       <table>
         <thead>
           <tr><th>Especialidad</th><th>Mención</th><th>Estado</th><th></th></tr>
@@ -40,46 +33,39 @@ import { AdminService, Especialidad } from './admin.service';
             <tr>
               <td>{{ e.nombre }}</td>
               <td>{{ e.mencion || '—' }}</td>
-              <td>{{ e.activa ? 'Activa' : 'Inactiva' }}</td>
               <td>
-                <button type="button" class="secundario" (click)="alternar(e)">
+                <span class="chip" [class.inactivo]="!e.activa">{{ e.activa ? 'Activa' : 'Inactiva' }}</span>
+              </td>
+              <td class="acciones">
+                <button mat-button type="button" (click)="alternar(e)">
                   {{ e.activa ? 'Desactivar' : 'Activar' }}
                 </button>
               </td>
             </tr>
           } @empty {
-            <tr><td colspan="4">Todavía no hay especialidades.</td></tr>
+            <tr><td colspan="4">No hay especialidades.</td></tr>
           }
         </tbody>
       </table>
-    }
+    </div>
   `,
   styles: [`
-    .ayuda { font-size: 0.9em; opacity: 0.75; }
-    .alta { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin: 16px 0 4px; }
-    .alta label { display: block; }
-    .alta input { display: block; padding: 8px; margin-top: 4px; }
-    button { padding: 8px 16px; }
-    .secundario { background: transparent; border: 1px solid #888; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ccc; }
-    .error { color: #b00020; }
-    .ok { color: #1b7a32; }
+    .ayuda { font-size: 0.9rem; opacity: 0.75; }
+    .barra { margin: 16px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--mat-sys-outline-variant); }
+    th { position: sticky; top: 0; background: var(--mat-sys-surface); z-index: 1; }
+    .acciones { white-space: nowrap; }
+    .chip { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; background: #c8e6c9; color: #1b5e20; }
+    .chip.inactivo { background: #e0e0e0; color: #424242; }
   `],
 })
 export class AdminEspecialidades implements OnInit {
-  private fb = inject(FormBuilder);
   private api = inject(AdminService);
+  private dialog = inject(MatDialog);
+  private aviso = inject(NotificacionService);
 
   especialidades = signal<Especialidad[]>([]);
-  cargando = signal(true);
-  mensaje = signal('');
-  error = signal('');
-
-  form = this.fb.nonNullable.group({
-    nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(80)]],
-    mencion: ['', Validators.maxLength(80)],
-  });
 
   ngOnInit() {
     this.cargar();
@@ -87,45 +73,50 @@ export class AdminEspecialidades implements OnInit {
 
   cargar() {
     this.api.listarEspecialidades().subscribe({
-      next: lista => {
-        this.especialidades.set(lista);
-        this.cargando.set(false);
-      },
-      error: () => {
-        this.error.set('No se pudieron cargar las especialidades.');
-        this.cargando.set(false);
-      },
+      next: lista => this.especialidades.set(lista),
+      error: () => this.aviso.error('No se pudieron cargar las especialidades.'),
     });
   }
 
-  crear() {
-    this.mensaje.set('');
-    this.error.set('');
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+  nueva() {
+    this.dialog
+      .open(EspecialidadDialog, { width: '460px', maxWidth: '95vw', disableClose: true })
+      .afterClosed()
+      .subscribe(creada => {
+        if (!creada) return;
+        this.aviso.ok('Especialidad creada.');
+        this.cargar();
+      });
+  }
+
+  alternar(e: Especialidad) {
+    if (!e.activa) {
+      this.cambiar(e, true);
       return;
     }
 
-    const v = this.form.getRawValue();
-    this.api.crearEspecialidad(v.nombre, v.mencion).subscribe({
-      next: () => {
-        this.mensaje.set('Especialidad creada.');
-        this.form.reset();
-        this.cargar();
-      },
-      error: e => this.error.set(e.error?.error ?? 'No se pudo crear la especialidad.'),
-    });
+    this.dialog
+      .open(ConfirmarDialog, {
+        data: {
+          titulo: 'Desactivar especialidad',
+          mensaje: `¿Desactivar "${e.nombre}${e.mencion ? ' mención ' + e.mencion : ''}"? Ya no se podrá elegir al crear docentes.`,
+          textoConfirmar: 'Desactivar',
+        },
+        maxWidth: '95vw',
+      })
+      .afterClosed()
+      .subscribe(ok => {
+        if (ok) this.cambiar(e, false);
+      });
   }
 
-  alternar(esp: Especialidad) {
-    const activar = !esp.activa;
-    if (!activar && !confirm(`¿Desactivar "${esp.nombre}"? Sus datos se conservan.`)) return;
-
-    this.mensaje.set('');
-    this.error.set('');
-    this.api.cambiarEspecialidad(esp.id_especialidad, activar).subscribe({
-      next: () => this.cargar(),
-      error: e => this.error.set(e.error?.error ?? 'No se pudo actualizar la especialidad.'),
+  private cambiar(e: Especialidad, activa: boolean) {
+    this.api.cambiarEspecialidad(e.id_especialidad, activa).subscribe({
+      next: () => {
+        this.aviso.ok(activa ? 'Especialidad activada.' : 'Especialidad desactivada.');
+        this.cargar();
+      },
+      error: err => this.aviso.error(err.error?.error ?? 'No se pudo cambiar el estado.'),
     });
   }
 }

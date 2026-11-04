@@ -1,12 +1,41 @@
-.contenedor { max-width: 640px; margin: 0 auto; padding: 24px; }
-.bloque { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 20px; }
-.ayuda { font-size: 0.9em; opacity: 0.75; }
-dl { display: grid; grid-template-columns: 180px 1fr; gap: 6px 12px; margin: 0; }
-dt { font-weight: 600; }
-dd { margin: 0; }
-label { display: block; margin-top: 12px; }
-input { display: block; width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
-button { margin-top: 16px; padding: 8px 16px; }
-.error { color: #b00020; }
-.ok { color: #1b7a32; }
-.aviso { background: #fff8e1; border-left: 4px solid #f9a825; padding: 8px 12px; color: #5d4300; }
+.ayuda { font-size: 0.9rem; opacity: 0.75; margin: 0 0 12px; }
+
+.completo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #1b5e20;
+  font-weight: 500;
+}
+
+.faltantes {
+  margin: 16px 0;
+  background: #fff8e1;
+  border-left: 4px solid #f9a825;
+  padding: 8px 16px;
+  color: #5d4300;
+}
+.faltantes ul { margin: 4px 0 0; padding-left: 20px; }
+
+.bloque {
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.bloque h3 { margin: 0 0 4px; }
+
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.campo input[disabled] {
+  color: var(--mat-sys-on-surface);
+  -webkit-text-fill-color: var(--mat-sys-on-surface);
+}
+.campo.falta { outline: 2px solid #f9a825; outline-offset: 2px; border-radius: 6px; }
+
+.acciones { margin-top: 16px; }

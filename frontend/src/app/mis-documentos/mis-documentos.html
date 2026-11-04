@@ -1,53 +1,65 @@
-<div class="contenedor">
-  <a routerLink="/dashboard">← Volver al menú</a>
-  <h2>Mis documentos</h2>
-  <p class="ayuda">
-    Sube cada documento firmado en PDF (máximo 5 MB). Si te lo observan, súbelo corregido:
-    se guarda como una versión nueva y la anterior queda en el historial.
-  </p>
+<h2>Mis documentos</h2>
+<p class="ayuda">
+  Sube cada documento firmado en PDF (máximo 5 MB). Si te lo observan, súbelo corregido:
+  se guarda como una versión nueva y la anterior queda en el historial.
+</p>
 
-  @if (mensaje()) { <p class="ok">{{ mensaje() }}</p> }
-  @if (error()) { <p class="error">{{ error() }}</p> }
-  @if (cargando()) { <p>Cargando tus documentos...</p> }
-
-  @for (d of documentos(); track d.id_tipo_documento) {
-    <section class="tarjeta">
-      <header>
-        <h3>
-          {{ d.nombre }}
+@if (!cargando()) {
+  <div class="grilla">
+    @for (d of documentos(); track d.id_tipo_documento) {
+      <section class="tarjeta">
+        <header>
+          <h3>{{ d.nombre }}</h3>
           @if (d.obligatorio) { <span class="tag">Obligatorio</span> }
-        </h3>
-        <span class="estado">{{ etiqueta(d.estado) }}</span>
-      </header>
+        </header>
 
-      <p class="ayuda">{{ d.descripcion }}</p>
+        <span class="chip" [class]="clase(d.estado)">{{ etiqueta(d.estado) }}</span>
 
-      @if (d.id_documento) {
-        <p>
-          Versión {{ d.version }} · {{ d.nombre_original }} ·
-          {{ d.creado_en | date:'dd/MM/yyyy HH:mm' }}
-          · <a [href]="urlDescarga(d.id_documento)">Descargar</a>
-        </p>
-      }
+        @if (d.descripcion) { <p class="ayuda">{{ d.descripcion }}</p> }
 
-      @if (d.estado === 'observado' && d.observacion) {
-        <p class="observacion"><strong>Observación:</strong> {{ d.observacion }}</p>
-      }
+        @if (d.id_documento) {
+          <p class="detalle">
+            Versión {{ d.version }} · {{ d.nombre_original }}
+            <br />
+            {{ d.creado_en | date:'dd/MM/yyyy HH:mm' }}
+            · <a [href]="urlDescarga(d.id_documento)">Descargar</a>
+          </p>
+        }
 
-      @if (d.estado === 'aprobado') {
-        <p class="ok">Documento aprobado. No necesitas hacer nada más.</p>
-      } @else {
-        <label class="subir">
-          {{ d.id_documento ? 'Subir versión corregida' : 'Subir documento (PDF)' }}
+        @if (d.estado === 'observado' && d.observacion) {
+          <p class="observacion">
+            <mat-icon fontSet="material-symbols-outlined" class="icono-obs">warning</mat-icon>
+            <span><strong>Observación:</strong> {{ d.observacion }}</span>
+          </p>
+        }
+
+        @if (d.estado === 'aprobado') {
+          <p class="completo">
+            <mat-icon fontSet="material-symbols-outlined">check_circle</mat-icon>
+            Documento aprobado. No necesitas hacer nada más.
+          </p>
+        } @else {
           <input
+            #archivoInput
             type="file"
             accept="application/pdf"
+            class="input-oculto"
             [disabled]="subiendoId() !== null"
             (change)="onArchivo(d, $event)"
           />
-        </label>
-        @if (subiendoId() === d.id_tipo_documento) { <p>Subiendo...</p> }
-      }
-    </section>
-  }
-</div>
+          <button
+            mat-stroked-button
+            type="button"
+            [disabled]="subiendoId() !== null"
+            (click)="elegirArchivo(d, archivoInput)"
+          >
+            <mat-icon fontSet="material-symbols-outlined">upload_file</mat-icon>
+            {{ subiendoId() === d.id_tipo_documento
+              ? 'Subiendo...'
+              : (d.id_documento ? 'Subir versión corregida' : 'Subir documento (PDF)') }}
+          </button>
+        }
+      </section>
+    }
+  </div>
+}

@@ -1,12 +1,82 @@
-.contenedor { max-width: 720px; margin: 0 auto; padding: 24px; }
-.ayuda { font-size: 0.9em; opacity: 0.75; }
-.tarjeta { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
-.tarjeta header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.tarjeta h3 { margin: 0; }
-.tag { font-size: 0.7em; border: 1px solid #888; border-radius: 4px; padding: 2px 6px; margin-left: 6px; vertical-align: middle; }
-.estado { white-space: nowrap; font-weight: 600; }
-.observacion { background: #fff3e0; border-left: 4px solid #ef6c00; padding: 8px 12px; color: #4e2a00; }
-.subir { display: block; margin-top: 8px; }
-.subir input { display: block; margin-top: 4px; }
-.error { color: #b00020; }
-.ok { color: #1b7a32; }
+.ayuda { font-size: 0.9rem; opacity: 0.75; margin: 0 0 16px; }
+
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.tarjeta {
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tarjeta header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tarjeta h3 { margin: 0; font-size: 1.05rem; }
+
+.tag {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  background: var(--rol-actual);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.chip {
+  align-self: flex-start;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.estado-pendiente { background: #e0e0e0; color: #424242; }
+.estado-cargado { background: #e3f2fd; color: #0d47a1; }
+.estado-revision { background: #fff8e1; color: #8a6400; }
+.estado-observado { background: #ffe0b2; color: #8a4b00; }
+.estado-aprobado { background: #c8e6c9; color: #1b5e20; }
+.estado-reemplazado { background: #eeeeee; color: #616161; }
+
+.detalle { font-size: 0.85rem; opacity: 0.8; margin: 0; }
+
+.observacion {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fff3e0;
+  border-left: 4px solid #fb8c00;
+  padding: 8px 12px;
+  margin: 0;
+  font-size: 0.9rem;
+}
+.icono-obs { color: #fb8c00; flex: 0 0 auto; }
+
+.completo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #1b5e20;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.input-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+@media (max-width: 480px) {
+  .grilla { grid-template-columns: 1fr; }
+}

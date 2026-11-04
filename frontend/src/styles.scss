@@ -1,0 +1,53 @@
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: light;
+  @include mat.theme((
+    color: mat.$azure-palette,
+    typography: Roboto,
+    density: 0
+  ));
+}
+
+/* Color de identidad de cada rol */
+:root {
+  --rol-administrador: #6a1b9a;
+  --rol-docente: #00695c;
+  --rol-estudiante: #1565c0;
+  --rol-actual: var(--mat-sys-primary);
+}
+.rol-administrador { --rol-actual: var(--rol-administrador); }
+.rol-docente { --rol-actual: var(--rol-docente); }
+.rol-estudiante { --rol-actual: var(--rol-estudiante); }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Roboto, sans-serif;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
+/* Contenido que nunca se sale de la pantalla */
+.contenido {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tabla-scroll {
+  overflow: auto;
+  max-height: 60vh;
+  max-width: 100%;
+}
+
+/* Modales y paneles largos: scroll interno, nunca fuera de la pantalla */
+.mat-mdc-dialog-content { max-height: 70vh !important; }
+
+@media (max-width: 600px) {
+  .contenido { padding: 12px; }
+}
+
+.snack-ok { --mat-snack-bar-container-color: #1b5e20; --mat-snack-bar-supporting-text-color: #fff; --mat-snack-bar-button-color: #fff; }
+.snack-error { --mat-snack-bar-container-color: #b71c1c; --mat-snack-bar-supporting-text-color: #fff; --mat-snack-bar-button-color: #fff; }
